@@ -3,26 +3,30 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const ejs = require('ejs');
 const mongoose=require('mongoose');
-const encrypt = require("mongoose-encryption");
-  
+// const encrypt = require("mongoose-encryption");
+const md5= require("md5");  
+
 const app = express();
   
 app.set('view engine','ejs');
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(express.static('public'));
-  
+
 //database section deifne
 mongoose.connect('mongodb://127.0.0.1:27017/userDB');
-
+// creating schema
 const userSchema=new mongoose.Schema({
 email:String,
 password:String
 });
-//database encryption
-const secretKey = process.env.SECRET;
 
-userSchema.plugin(encrypt,{secret : secretKey,
-     encryptedFields:["password"]});
+// // database encryption using key mongoose encryption
+// const secretKey = process.env.SECRET;
+
+// userSchema.plugin(encrypt,{secret : secretKey,
+//      encryptedFields:["password"]});
+
+//db model
 const User=mongoose.model('User',userSchema);
   
 
@@ -42,7 +46,7 @@ res.render('register');
 
 app.post('/register',(req,res)=>{
     const UserName=req.body.username;
-    const Password=req.body.password;
+    const Password=md5(req.body.password);
     const newRegister = new User({
         email: UserName,
         password: Password
@@ -77,7 +81,7 @@ app.post('/register',(req,res)=>{
 
 app.post('/login',(req,res)=>{
     const UserName=req.body.username;
-    const Password=req.body.password;
+    const Password=md5(req.body.password);
     
     const emailPrefix=UserName.split('@')[0];
     User.findOne({email:UserName})
