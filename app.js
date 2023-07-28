@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const ejs = require('ejs');
@@ -18,7 +19,7 @@ email:String,
 password:String
 });
 //database encryption
-const secretKey = "thisisourliitlesecret";
+const secretKey = process.env.SECRET;
 
 userSchema.plugin(encrypt,{secret : secretKey,
      encryptedFields:["password"]});
